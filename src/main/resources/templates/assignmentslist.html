@@ -39,6 +39,10 @@
             </a>
         </div>
     </div>
+    <form th:action ="@{/assignments}" method="get">
+        <input id="txtsearch" type="text" name="keyword">
+        <button type="submit">Go</button>
+    </form>
     <br/>
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
@@ -57,16 +61,16 @@
             <td th:text ="${list.major.majorname}"></td>
             <td th:text ="${list.alpha1}"></td>
             <td th:text ="${list.alpha2}"></td>
-<!--            <td>-->
-<!--                <a th:href ="@{/advisors/edit/{id}(id=${advisor.id})}" class="btn btn-primary">Update Profile-->
-<!--                </a>-->
-<!--                &lt;!&ndash;/*@thymesVar id="assignments" type=""*/&ndash;&gt;-->
-<!--                &lt;!&ndash;                <a th:href ="@{/assignments}" class="btn btn-primary">Assignments&ndash;&gt;-->
-<!--                &lt;!&ndash;                </a>&ndash;&gt;-->
-<!--                <br/>-->
-<!--                <a th:href ="@{/advisors/{id}(id=${advisor.id})}" class="btn btn-danger">Delete-->
-<!--                </a>-->
-<!--            </td>-->
+            <td>
+                <a th:href ="@{/assignments/edit/{id}(id=${list.assignmentid})}" class="btn btn-primary">Edit
+                </a>
+                <!--/*@thymesVar id="assignments" type=""*/-->
+                <!--                <a th:href ="@{/assignments}" class="btn btn-primary">Assignments-->
+                <!--                </a>-->
+                <br/>
+                <a th:href ="@{/assignments/{id}(id=${list.assignmentid})}" class="btn btn-danger">Delete
+                </a>
+            </td>
         </tr>
         </tbody>
 

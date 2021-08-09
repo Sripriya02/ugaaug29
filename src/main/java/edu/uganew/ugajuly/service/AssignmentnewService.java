@@ -12,4 +12,5 @@ public interface AssignmentnewService {
     List<Assignmentnew> getAllAssignments();
     Assignmentnew addAssignment(Assignmentnew assignmentnew);
 
+
 }

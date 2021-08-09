@@ -1,5 +1,4 @@
 package edu.uganew.ugajuly.entity;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.List;
@@ -128,6 +127,12 @@ public class Advisor {
 
     public void setLink(String link) {
         this.Link = link;
+    }
+
+    @Transient
+    public String getPhotosImagePath() {
+        if (Photo == null || id == null) return null;
+        return "/user-photos/" + id + "/" + Photo;
     }
 
 

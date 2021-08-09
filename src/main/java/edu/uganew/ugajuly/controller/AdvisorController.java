@@ -1,5 +1,6 @@
 package edu.uganew.ugajuly.controller;
 
+import edu.uganew.ugajuly.FileUploadUtil;
 import edu.uganew.ugajuly.entity.Advisor;
 import edu.uganew.ugajuly.entity.Major;
 import edu.uganew.ugajuly.service.AdvisorService;
@@ -10,8 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -36,14 +40,17 @@ public class AdvisorController {
         this.advisorService = advisorService;
         this.majorService = majorService;
     }
-
-
-
-
     @GetMapping("/advisors")
-    public String listAdvisors(Model model)
+    public String listAdvisors(Model model,String keyword)
     {
-        model.addAttribute("advisors",advisorService.getAllAdvisors());
+        if(keyword != null)
+        {
+            model.addAttribute("advisors",advisorService.findByKeyword(keyword));
+        }
+        else
+        {
+            model.addAttribute("advisors", advisorService.getAllAdvisors());
+        }
         return "advisors";
     }
     @GetMapping("/advisors/new")
@@ -55,9 +62,12 @@ public class AdvisorController {
     }
 
     @PostMapping("/advisors")
-    public String saveAdvisor(@ModelAttribute("advisor") Advisor advisor)
-    {
-        advisorService.saveAdvisor(advisor);
+    public String saveAdvisor(@ModelAttribute("advisor") Advisor advisor, @RequestParam("photo")MultipartFile multipartFile) throws IOException {
+        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        advisor.setPhoto(fileName);
+        Advisor savedAdvisor = advisorService.saveAdvisor(advisor);
+        String uploadDir = "user-photos/" + savedAdvisor.getId();
+        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         return "redirect:/advisors";
     }
 
@@ -92,10 +102,5 @@ public class AdvisorController {
         advisorService.deleteAdvisorById(id);
         return "redirect:/advisors";
     }
-//    @GetMapping("/advisors/assignments/{id}")
-//    public String advisorAssignmentForm(@PathVariable Long id,Model model)
-//    {
-//      model.addAttribute("advisor",advisorService.getAdvisorById(id));
-//       return "assignment_advisor";
-//    }
+
 }

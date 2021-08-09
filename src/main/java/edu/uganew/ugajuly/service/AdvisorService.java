@@ -12,5 +12,6 @@ public interface AdvisorService {
     Advisor updateAdvisor(Advisor advisor);
     void deleteAdvisorById(Long id);
     List<Advisor> findByStuLastName(String studendName,String majorname);
+    List<Advisor> findByKeyword(String Keyword);
 
 }

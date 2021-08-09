@@ -42,4 +42,9 @@ public class AdvisorServiceImpl implements AdvisorService {
 
         return advisorRepository.findByStuLastName(studendName.substring(0,2),majorname);
     }
+
+    public List<Advisor> findByKeyword(String keyword)
+    {
+        return advisorRepository.findByKeyword(keyword);
+    }
 }

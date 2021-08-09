@@ -10,6 +10,7 @@ import edu.uganew.ugajuly.repository.MajorRepository;
 import edu.uganew.ugajuly.service.AdvisorService;
 import edu.uganew.ugajuly.service.AssignmentnewService;
 import edu.uganew.ugajuly.service.MajorService;
+import edu.uganew.ugajuly.service.impl.AssignmentnewServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -35,6 +37,8 @@ public class AssignmentnewController {
     private AdvisorService advisorService;
     @Autowired
     private MajorService majorService;
+    @Autowired
+    private AssignmentnewServiceImpl assignmentnewService;
 
     @Autowired
     private AssignmentnewRepository assignmentnewRepository;
@@ -46,9 +50,16 @@ public class AssignmentnewController {
     private MajorRepository majorRepository;
 
     @GetMapping("/assignments")
-    public String listAssignment(Model model)
+    public String listAssignment(Model model,String keyword)
     {
-        model.addAttribute("assignments", assignmentnewRepository.findAll());
+        if(keyword != null)
+        {
+            model.addAttribute("assignments",assignmentnewRepository.findByKeyword(keyword));
+        }
+        else
+        {
+            model.addAttribute("assignments", assignmentnewRepository.findAll());
+        }
         return "assignmentslist";
     }
 
@@ -65,23 +76,53 @@ public class AssignmentnewController {
     }
 
     @PostMapping("/assignments/save")
-    public String saveAssignment(Assignmentnew assignmentnew)
+    public String saveAssignment(Assignmentnew assignmentnew, HttpServletRequest request)
     {
+        String[] alpha1 = request.getParameterValues("alpha1");
+        String[] alpha2 = request.getParameterValues("alpha2");
+        for(int i=0;i< alpha1.length;i++)
+        {
+//            System.out.println(alpha1.length);
+//            assignmentnew.add(alpha1[i],alpha2[i]);
+            assignmentnewService.addAlpha(alpha1[i],alpha2[i]);
+        }
         assignmentnewRepository.save(assignmentnew);
         return "redirect:/assignments";
     }
+    @GetMapping("/assignments/edit/{assignmentid}")
+    public String editAssignmentForm(@PathVariable Integer assignmentid,Model model)
+    {
+        Assignmentnew assignmentnew = assignmentnewRepository.findById(assignmentid).get();
+        model.addAttribute("assignmentnew",assignmentnew);
+        List<Advisor> advisorslist=advisorRepository.findAll();
+        List<Major> majorList=majorRepository.findAll();
+        model.addAttribute("advisorslist",advisorslist);
+        model.addAttribute("majorslist",majorList);
+        return "assignment_advisor";
+    }
 
-//    @GetMapping("/findByStuName/{stuName}/{majorname}")
-//    public ResponseEntity<List<Advisor>> findByStuLastName (@PathVariable("majorname") String majorid, @PathVariable("stuName") String stuName) {
-//        List<Advisor> advisors = advisorService.findByStuLastName(majorid, stuName);
-//        return new ResponseEntity<>(advisors, HttpStatus.OK);
-//    }
-
-//    @PostMapping("/assignments/add")
-//    public ResponseEntity<Assignmentnew> addAssignment(@RequestBody Assignmentnew assignmentnew) {
-//        Assignmentnew newAssignment = assignmentnewService.addAssignment(assignmentnew);
-//        return new ResponseEntity<>(newAssignment, HttpStatus.CREATED);
-//    }
+    @PostMapping("/assignments/{assignmentid}")
+    public String updateAssignment(@PathVariable Integer assignmentid, @ModelAttribute("assignmentnew") Assignmentnew assignmentnew)
+    {
+        //get assignment from database by id
+        Assignmentnew existingAssignment = assignmentnewRepository.findById(assignmentid).get();
+        existingAssignment.setAssignmentid(assignmentnew.getAssignmentid());
+        existingAssignment.setMajor(assignmentnew.getMajor());
+        existingAssignment.setAdvisor(assignmentnew.getAdvisor());
+        existingAssignment.setAlpha1(assignmentnew.getAlpha1());
+        existingAssignment.setAlpha2(assignmentnew.getAlpha2());
+        //save update advisor object
+        assignmentnewRepository.save(existingAssignment);
+        System.out.println("Record Updated");
+        return "redirect:/assignments";
+    }
+    //handler method to handle delete advisor
+    @GetMapping("/assignments/{assignmentid}")
+    public String deleteAssignment(@PathVariable Integer assignmentid)
+    {
+        assignmentnewRepository.deleteById(assignmentid);
+        return "redirect:/assignments";
+    }
 
 
 }

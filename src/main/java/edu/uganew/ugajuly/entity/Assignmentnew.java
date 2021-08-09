@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.uganew.ugajuly.entity.Advisor;
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="assignment")
@@ -18,21 +20,25 @@ public class Assignmentnew {
     @Column(name="alpha2")
     private String Alpha2;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advisor_id",nullable = false)
     private Advisor advisor;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "major_id",nullable = false)
     private Major major;
 
     public Assignmentnew()
     {}
 
-    public Assignmentnew(Integer assignmentid, String alpha1, String alpha2) {
-        this.assignmentid = assignmentid;
+
+    public Assignmentnew( String  alpha1, String alpha2,Advisor advisor,Major major) {
+
         Alpha1 = alpha1;
         Alpha2 = alpha2;
+        this.advisor = advisor;
+        this.major = major;
+
     }
 
     public Integer getAssignmentid() {
